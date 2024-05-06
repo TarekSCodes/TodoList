@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             TxtBoxTodoEntry = new TextBox();
-            LstViewTodos = new ListView();
+            flowLayoutPanelTodos = new FlowLayoutPanel();
             SuspendLayout();
             // 
             // TxtBoxTodoEntry
@@ -39,26 +39,27 @@
             TxtBoxTodoEntry.Location = new Point(12, 12);
             TxtBoxTodoEntry.Name = "TxtBoxTodoEntry";
             TxtBoxTodoEntry.PlaceholderText = "Add Todo";
-            TxtBoxTodoEntry.Size = new Size(776, 32);
+            TxtBoxTodoEntry.Size = new Size(560, 32);
             TxtBoxTodoEntry.TabIndex = 0;
             TxtBoxTodoEntry.KeyDown += TxtBoxTodoEntry_KeyDown;
             // 
-            // LstViewTodos
+            // flowLayoutPanelTodos
             // 
-            LstViewTodos.CheckBoxes = true;
-            LstViewTodos.Location = new Point(12, 50);
-            LstViewTodos.Name = "LstViewTodos";
-            LstViewTodos.Size = new Size(776, 388);
-            LstViewTodos.TabIndex = 1;
-            LstViewTodos.UseCompatibleStateImageBehavior = false;
+            flowLayoutPanelTodos.AutoScroll = true;
+            flowLayoutPanelTodos.FlowDirection = FlowDirection.TopDown;
+            flowLayoutPanelTodos.Location = new Point(12, 59);
+            flowLayoutPanelTodos.Name = "flowLayoutPanelTodos";
+            flowLayoutPanelTodos.Size = new Size(560, 379);
+            flowLayoutPanelTodos.TabIndex = 1;
+            flowLayoutPanelTodos.WrapContents = false;
             // 
             // TodoViewerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(800, 450);
-            Controls.Add(LstViewTodos);
+            ClientSize = new Size(584, 461);
+            Controls.Add(flowLayoutPanelTodos);
             Controls.Add(TxtBoxTodoEntry);
             Name = "TodoViewerForm";
             StartPosition = FormStartPosition.CenterScreen;
@@ -70,6 +71,6 @@
         #endregion
 
         private TextBox TxtBoxTodoEntry;
-        private ListView LstViewTodos;
+        private FlowLayoutPanel flowLayoutPanelTodos;
     }
 }
