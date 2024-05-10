@@ -61,9 +61,12 @@
             ClientSize = new Size(584, 461);
             Controls.Add(flowLayoutPanelTodos);
             Controls.Add(TxtBoxTodoEntry);
+            KeyPreview = true;
+            MaximizeBox = false;
             Name = "TodoViewerForm";
+            ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "TodoList";
+            KeyDown += TodoViewerForm_KeyDown;
             ResumeLayout(false);
             PerformLayout();
         }
