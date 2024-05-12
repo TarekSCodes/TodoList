@@ -19,7 +19,4 @@ public class TodoModel
         TodoContent = todoContent;
         TodoDone = todoDone;
     }
-
-
-
 }

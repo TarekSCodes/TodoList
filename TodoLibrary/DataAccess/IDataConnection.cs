@@ -5,10 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using TodoLibrary.Models;
 
-namespace TodoLibrary.DataAccess
+namespace TodoLibrary.DataAccess;
+
+public interface IDataConnection
 {
-    public interface IDataConnection
-    {
-        TodoModel CreateTodoModel(TodoModel todo);
-    }
+    TodoModel CreateTodoModel(TodoModel todo);
+
+    void UpdateTodoModel(TodoModel todo);
+
+    List<TodoModel> LoadTodosFromFile();
 }

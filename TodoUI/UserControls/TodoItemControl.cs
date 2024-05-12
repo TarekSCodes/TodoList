@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TodoLibrary;
+using TodoLibrary.Models;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace TodoUI;
@@ -15,17 +17,33 @@ namespace TodoUI;
 public partial class TodoItemControl : UserControl
 {
     private bool isChecked = false;
+    
+    private TodoModel model;
 
-    public TodoItemControl()
+    public TodoModel Model
     {
-        InitializeComponent();
+        get { return model; }
+        set
+        {
+            model = value;
+            TodoContent = model.TodoContent;
+            TodoDone = model.TodoDone;
+        }
     }
 
     public string TodoContent
     {
         get { return label1.Text; }
-        set { label1.Text = value; }
+        set 
+        {
+            label1.Text = value;
+            if (model != null)
+            {
+                model.TodoContent = value;
+            }
+        }
     }
+    
     public bool TodoDone
     {
         get { return isChecked; }
@@ -33,12 +51,23 @@ public partial class TodoItemControl : UserControl
         {
             isChecked = value;
             pictureBox1.Image = isChecked ? Properties.Resources.CheckBoxChecked1 : Properties.Resources.CheckBoxUnchecked1;
-            label1.Font = isChecked ? new System.Drawing.Font(label1.Font, FontStyle.Strikeout) : new System.Drawing.Font(label1.Font, FontStyle.Regular);
+            label1.Font = isChecked ? new System.Drawing.Font(label1.Font, FontStyle.Strikeout) : new System.Drawing.Font(label1.Font, FontStyle.Bold);
+            if (model != null)
+            {
+                model.TodoDone = isChecked;
+            }
         }
     }
 
     private void pictureBox1_Click(object sender, EventArgs e)
     {
         TodoDone = !TodoDone;
+
+        GlobalConfig.Connection.UpdateTodoModel(this.Model);
+    }
+
+    public TodoItemControl()
+    {
+        InitializeComponent();
     }
 }

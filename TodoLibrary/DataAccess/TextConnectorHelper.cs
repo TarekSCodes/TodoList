@@ -8,7 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TodoLibrary.Models;
 
+
 namespace TodoLibrary.DataAccess;
+
 
 public static class TextConnectorHelper
 {
@@ -37,6 +39,12 @@ public static class TextConnectorHelper
         return File.ReadLines(file).ToList();
     }
 
+    /// <summary>
+    /// Legt für jeden Zeile in der Datei ein TodoModel an und
+    /// gibt gibt diese in einer List<TodoModel> zurück.
+    /// </summary>
+    /// <param name="lines"></param>
+    /// <returns>List<TodoModel></returns>
     public static List<TodoModel> ConvertToTodoModels(this List<string> lines)
     {
         List<TodoModel> output = new List<TodoModel>();

@@ -30,6 +30,8 @@
         {
             TxtBoxTodoEntry = new TextBox();
             flowLayoutPanelTodos = new FlowLayoutPanel();
+            BtnQuit = new Button();
+            BtnSettings = new Button();
             SuspendLayout();
             // 
             // TxtBoxTodoEntry
@@ -49,9 +51,28 @@
             flowLayoutPanelTodos.FlowDirection = FlowDirection.TopDown;
             flowLayoutPanelTodos.Location = new Point(12, 59);
             flowLayoutPanelTodos.Name = "flowLayoutPanelTodos";
-            flowLayoutPanelTodos.Size = new Size(560, 379);
-            flowLayoutPanelTodos.TabIndex = 1;
+            flowLayoutPanelTodos.Size = new Size(560, 344);
+            flowLayoutPanelTodos.TabIndex = 4;
             flowLayoutPanelTodos.WrapContents = false;
+            // 
+            // BtnQuit
+            // 
+            BtnQuit.Location = new Point(523, 426);
+            BtnQuit.Name = "BtnQuit";
+            BtnQuit.Size = new Size(49, 23);
+            BtnQuit.TabIndex = 2;
+            BtnQuit.Text = "Quit";
+            BtnQuit.UseVisualStyleBackColor = true;
+            BtnQuit.Click += BtnQuit_Click;
+            // 
+            // BtnSettings
+            // 
+            BtnSettings.Location = new Point(442, 426);
+            BtnSettings.Name = "BtnSettings";
+            BtnSettings.Size = new Size(75, 23);
+            BtnSettings.TabIndex = 1;
+            BtnSettings.Text = "Settings";
+            BtnSettings.UseVisualStyleBackColor = true;
             // 
             // TodoViewerForm
             // 
@@ -59,6 +80,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(584, 461);
+            Controls.Add(BtnSettings);
+            Controls.Add(BtnQuit);
             Controls.Add(flowLayoutPanelTodos);
             Controls.Add(TxtBoxTodoEntry);
             KeyPreview = true;
@@ -66,6 +89,8 @@
             Name = "TodoViewerForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
+            TopMost = true;
+            Load += TodoViewerForm_Load;
             KeyDown += TodoViewerForm_KeyDown;
             ResumeLayout(false);
             PerformLayout();
@@ -75,5 +100,7 @@
 
         private TextBox TxtBoxTodoEntry;
         private FlowLayoutPanel flowLayoutPanelTodos;
+        private Button BtnQuit;
+        private Button BtnSettings;
     }
 }

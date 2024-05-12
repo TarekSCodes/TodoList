@@ -34,4 +34,23 @@ public class TextConnector : IDataConnection
 
         return model;
     }
+
+    public void UpdateTodoModel(TodoModel model)
+    {
+        List<TodoModel> todos = TodoFile.FullFilePath().LoadFile().ConvertToTodoModels();
+
+        var item = todos.FirstOrDefault(x => x.Id == model.Id);
+        if (item != null)
+        {
+            item.TodoDone = model.TodoDone;
+        }
+
+        todos.SaveToTodoFile(TodoFile);
+    }
+
+    public List<TodoModel> LoadTodosFromFile()
+    {
+        List<string> lines = TodoFile.FullFilePath().LoadFile();
+        return lines.ConvertToTodoModels();
+    }
 }
