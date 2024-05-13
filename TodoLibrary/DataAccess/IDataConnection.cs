@@ -11,7 +11,7 @@ public interface IDataConnection
 {
     TodoModel CreateTodoModel(TodoModel todo);
 
-    void UpdateTodoModel(TodoModel todo);
+    void UpdateTodoDone(TodoModel todo);
 
     List<TodoModel> LoadTodosFromFile();
 }

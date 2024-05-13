@@ -35,7 +35,13 @@ public class TextConnector : IDataConnection
         return model;
     }
 
-    public void UpdateTodoModel(TodoModel model)
+    /// <summary>
+    /// Aktualisiert den Status des Todo-Eintrags (ob erledigt oder nicht) basierend auf dem übergebenen TodoModel.
+    /// Diese Methode lädt zunächst die Liste aller Todo-Einträge aus einer Datei, sucht den spezifischen Eintrag basierend auf der ID
+    /// des übergebenen Modells und aktualisiert dessen 'TodoDone'-Status. Anschließend wird die aktualisierte Liste wieder in der Datei gespeichert.
+    /// </summary>
+    /// <param name="model">Das TodoModel, das den zu aktualisierenden Eintrag enthält. Es sollte eine gültige ID und den neuen 'TodoDone'-Status enthalten.</param>
+    public void UpdateTodoDone(TodoModel model)
     {
         List<TodoModel> todos = TodoFile.FullFilePath().LoadFile().ConvertToTodoModels();
 

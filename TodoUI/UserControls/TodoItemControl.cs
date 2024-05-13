@@ -14,6 +14,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace TodoUI;
 
+// TODO - Hinzufügen eines grafischen Trennzeichens im Designer zwischen TodoContent und TodoDone
 public partial class TodoItemControl : UserControl
 {
     private bool isChecked = false;
@@ -63,7 +64,7 @@ public partial class TodoItemControl : UserControl
     {
         TodoDone = !TodoDone;
 
-        GlobalConfig.Connection.UpdateTodoModel(this.Model);
+        GlobalConfig.Connection.UpdateTodoDone(this.Model);
     }
 
     public TodoItemControl()

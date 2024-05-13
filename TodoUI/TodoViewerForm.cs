@@ -10,10 +10,16 @@ public partial class TodoViewerForm : Form
     {
         InitializeComponent();
 
-        // Hiddes the titlebar
+        // Versteckt die Titelleiste
         this.FormBorderStyle = FormBorderStyle.None;
     }
 
+    /// <summary>
+    /// Reagiert auf das KeyDown-Ereignis der Textbox für Todo-Einträge. Wenn die Enter-Taste gedrückt wird,
+    /// unterdrückt diese Methode das akustische Signal des Tastendrucks und prüft den Text der Textbox auf Inhalte.
+    /// Ist der Text nicht leer oder nur Leerzeichen, wird ein neues TodoModel-Objekt erstellt und dem Datenmodell hinzugefügt.
+    /// Das zugehörige TodoItemControl wird dann im FlowLayoutPanel hinzugefügt und das Textfeld geleert.
+    /// </summary>
     private void TxtBoxTodoEntry_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.KeyCode == Keys.Enter)
@@ -39,6 +45,10 @@ public partial class TodoViewerForm : Form
         }
     }
 
+    /// <summary>
+    /// Behandelt das KeyDown-Ereignis für die TodoViewerForm. Wenn die Escape-Taste gedrückt wird,
+    /// unterdrückt die Methode die weitere Verarbeitung des Tastendrucks und minimiert das Fenster der Form.
+    /// </summary>
     private void TodoViewerForm_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.KeyCode == Keys.Escape)
@@ -63,6 +73,14 @@ public partial class TodoViewerForm : Form
         }
     }
 
+    /// <summary>
+    /// Fügt ein TodoItemControl, das das übergebene TodoModel repräsentiert, zum FlowLayoutPanel hinzu.
+    /// Diese Methode erstellt ein neues TodoItemControl-Objekt, setzt dessen Model-Eigenschaft auf das übergebene
+    /// TodoModel und fügt es dann zur Steuerelementsammlung des FlowLayoutPanels hinzu. Dies dient der visuellen
+    /// Darstellung des Todo-Modells in der Benutzeroberfläche.
+    /// </summary>
+    /// <param name="model">Das TodoModel, das in der Benutzeroberfläche angezeigt werden soll. Das Modell enthält
+    /// die Daten, die im TodoItemControl visualisiert werden.</param>
     private void AddTodoToUI(TodoModel model)
     {
         TodoItemControl todoitem = new TodoItemControl
@@ -73,11 +91,24 @@ public partial class TodoViewerForm : Form
         flowLayoutPanelTodos.Controls.Add(todoitem);
     }
 
+    /// <summary>
+    /// Behandelt das Click-Ereignis des "Quit"-Buttons. Diese Methode schließt das aktuelle Formular,
+    /// was typischerweise zum Beenden der Anwendung oder zum Schließen des aktuellen Fensters führt.
+    /// </summary>
     private void BtnQuit_Click(object sender, EventArgs e)
     {
         this.Close();
     }
-    
+
+    /// <summary>
+    /// Überschreibt die Behandlung von Tastendruck-Ereignissen zur speziellen Handhabung der Tab-Taste. 
+    /// Wenn die Tab-Taste gedrückt wird, während das Steuerelement mit dem TabIndex 2 den Fokus hat,
+    /// wird der Fokus zum ersten Steuerelement (TabIndex 0) im Formular verschoben, das fokussierbar ist.
+    /// Für alle anderen Tastendrücke wird das Standardverhalten genutzt.
+    /// </summary>
+    /// <param name="msg">Eine Referenz auf die Nachricht, die das Tastendruck-Ereignis repräsentiert.</param>
+    /// <param name="keyData">Die Daten der gedrückten Taste, einschließlich der Tab-Taste.</param>
+    /// <returns>Gibt true zurück, wenn die Tastenaktion verarbeitet wurde, sonst false, um das Standardverhalten zu ermöglichen.</returns>
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
         if (keyData == Keys.Tab)
