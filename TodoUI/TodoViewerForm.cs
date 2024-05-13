@@ -9,6 +9,8 @@ public partial class TodoViewerForm : Form
     public TodoViewerForm()
     {
         InitializeComponent();
+        SetFormPosition();
+        
 
         // Versteckt die Titelleiste
         this.FormBorderStyle = FormBorderStyle.None;
@@ -71,6 +73,15 @@ public partial class TodoViewerForm : Form
         {
             AddTodoToUI(todo);
         }
+    }
+
+    private void SetFormPosition()
+    {
+        this.Size = new Size(600, 500);
+
+        Rectangle screenSize = Screen.PrimaryScreen.WorkingArea;
+
+        this.Location = new Point(screenSize.Width - this.Width, screenSize.Height - this.Height + 22);
     }
 
     /// <summary>

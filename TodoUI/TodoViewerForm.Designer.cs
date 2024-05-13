@@ -87,8 +87,7 @@
             KeyPreview = true;
             MaximizeBox = false;
             Name = "TodoViewerForm";
-            ShowIcon = false;
-            StartPosition = FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.Manual;
             TopMost = true;
             Load += TodoViewerForm_Load;
             KeyDown += TodoViewerForm_KeyDown;
