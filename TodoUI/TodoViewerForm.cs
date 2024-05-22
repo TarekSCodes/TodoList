@@ -4,16 +4,78 @@ using TodoLibrary.Models;
 
 namespace TodoUI;
 
+// TODO - App beim Systemstart oder anmelden starten
+// TODO - Tastenkombi zum öffnen und Focusieren des Fenster implementieren
+// TODO - Neuste Todos immer oben einfügen
+/* TODO - Kategorien
+ * Erstellbar, Löschbar
+ * speichern in einer csv Datei
+ * Farbe wählbar
+ */
+
+/* TODO - Settings
+ * Abgehakte Todos ausblenden Ja/Nein Checkbox
+ * Tastenkombi zum öffnen selbst vergeben
+ * Topmost Ja/Nein
+*/
+
 public partial class TodoViewerForm : Form
 {
+
+    private NotifyIcon trayIcon;
+    private ContextMenuStrip trayMenu;
+
     public TodoViewerForm()
     {
         InitializeComponent();
-        SetFormPosition();
-        
-
+        //SetFormPosition();
         // Versteckt die Titelleiste
-        this.FormBorderStyle = FormBorderStyle.None;
+        //this.FormBorderStyle = FormBorderStyle.None;
+
+        // Erstellen eines ContextMenüs
+        trayMenu = new ContextMenuStrip();
+        trayMenu.Items.Add("Öffnen", null, OnOpen);
+        trayMenu.Items.Add("Beenden", null, OnExit);
+        
+        // Erstellen eines SystemTrayIcons
+        trayIcon = new NotifyIcon();
+        trayIcon.Text = "Simple Todos";
+        trayIcon.Icon = Properties.Resources.Icon;
+
+        trayIcon.ContextMenuStrip = trayMenu;
+        trayIcon.Visible = true;
+
+        trayIcon.DoubleClick += OnOpen;
+    }
+
+    private void OnOpen(object sender, EventArgs e)
+    {
+        Show();
+        WindowState = FormWindowState.Normal;
+        trayIcon.Visible = false;
+    }
+
+    private void OnExit(object sender, EventArgs e)
+    {
+        trayIcon.Visible = false;
+        Application.Exit();
+    }
+
+    protected override void OnResize(EventArgs e)
+    {
+        base.OnResize(e);
+
+        if (WindowState == FormWindowState.Minimized)
+        {
+            Hide();
+            trayIcon.Visible = true;
+        }
+    }
+
+    protected override void OnFormClosing(FormClosingEventArgs e)
+    {
+        trayIcon.Visible = false;
+        base.OnFormClosing(e);
     }
 
     /// <summary>
@@ -31,7 +93,7 @@ public partial class TodoViewerForm : Form
 
             if (!String.IsNullOrWhiteSpace(TxtBoxTodoEntry.Text))
             {
-                // Create the TodoModel from input
+                // Erstellt das TodoModel aus dem Input
                 TodoModel model = new TodoModel(TxtBoxTodoEntry.Text, false);
                 GlobalConfig.Connection.CreateTodoModel(model);
 
@@ -58,6 +120,10 @@ public partial class TodoViewerForm : Form
             e.SuppressKeyPress = true;
             this.WindowState = FormWindowState.Minimized;
         }
+        else if (e.Control && e.KeyCode == Keys.N)
+        {
+            this.WindowState = FormWindowState.Normal;
+        }
     }
 
     private void TodoViewerForm_Load(object sender, EventArgs e)
@@ -75,6 +141,11 @@ public partial class TodoViewerForm : Form
         }
     }
 
+    /// <summary>
+    /// Setzt die Größe des Formulars und positioniert es unten rechts auf dem Bildschirm.
+    /// Die Methode berechnet die optimale Position basierend auf der Arbeitsfläche des primären Bildschirms,
+    /// sodass das Formular in der Ecke des Bildschirms angezeigt wird, mit einer kleinen Verschiebung von 22 Pixeln nach oben.
+    /// </summary>
     private void SetFormPosition()
     {
         this.Size = new Size(600, 500);
@@ -84,14 +155,6 @@ public partial class TodoViewerForm : Form
         this.Location = new Point(screenSize.Width - this.Width, screenSize.Height - this.Height + 22);
     }
 
-    /// <summary>
-    /// Fügt ein TodoItemControl, das das übergebene TodoModel repräsentiert, zum FlowLayoutPanel hinzu.
-    /// Diese Methode erstellt ein neues TodoItemControl-Objekt, setzt dessen Model-Eigenschaft auf das übergebene
-    /// TodoModel und fügt es dann zur Steuerelementsammlung des FlowLayoutPanels hinzu. Dies dient der visuellen
-    /// Darstellung des Todo-Modells in der Benutzeroberfläche.
-    /// </summary>
-    /// <param name="model">Das TodoModel, das in der Benutzeroberfläche angezeigt werden soll. Das Modell enthält
-    /// die Daten, die im TodoItemControl visualisiert werden.</param>
     private void AddTodoToUI(TodoModel model)
     {
         TodoItemControl todoitem = new TodoItemControl

@@ -23,7 +23,7 @@ internal static class Program
 
         TodoLibrary.GlobalConfig.InitializeConnections();
 
-
+        Application.EnableVisualStyles();
         Application.Run(new TodoViewerForm());
     }
 }

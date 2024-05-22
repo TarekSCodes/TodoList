@@ -49,6 +49,7 @@
             // 
             flowLayoutPanelTodos.AutoScroll = true;
             flowLayoutPanelTodos.FlowDirection = FlowDirection.TopDown;
+            flowLayoutPanelTodos.ForeColor = Color.DimGray;
             flowLayoutPanelTodos.Location = new Point(12, 59);
             flowLayoutPanelTodos.Name = "flowLayoutPanelTodos";
             flowLayoutPanelTodos.Size = new Size(560, 344);
@@ -84,10 +85,13 @@
             Controls.Add(BtnQuit);
             Controls.Add(flowLayoutPanelTodos);
             Controls.Add(TxtBoxTodoEntry);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             KeyPreview = true;
             MaximizeBox = false;
             Name = "TodoViewerForm";
-            StartPosition = FormStartPosition.Manual;
+            ShowIcon = false;
+            ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterScreen;
             TopMost = true;
             Load += TodoViewerForm_Load;
             KeyDown += TodoViewerForm_KeyDown;

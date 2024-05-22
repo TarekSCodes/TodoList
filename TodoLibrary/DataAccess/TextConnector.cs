@@ -14,7 +14,7 @@ public class TextConnector : IDataConnection
 
     public TodoModel CreateTodoModel(TodoModel model)
     {
-        // Load the file and convert the text to List<TodoModel>
+        // Lädt die Textdatei und konvertiert den Text in eine List<TodoModel>
         List<TodoModel> todos = TodoFile.FullFilePath().LoadFile().ConvertToTodoModels();
 
         // Find the max ID
@@ -28,8 +28,8 @@ public class TextConnector : IDataConnection
         // Add the new record with the new ID (max + 1)
         todos.Add(model);
 
-        // Convert the persons to List<string>
-        // Save the List<string> to the text file
+        // Konvertiert das TodoModel in List<string>
+        // Speichert die List<string> in die Textdatei
         todos.SaveToTodoFile(TodoFile);
 
         return model;

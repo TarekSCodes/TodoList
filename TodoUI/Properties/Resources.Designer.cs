@@ -63,9 +63,9 @@ namespace TodoUI.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap CheckBoxChecked1 {
+        internal static System.Drawing.Bitmap AddNoColor {
             get {
-                object obj = ResourceManager.GetObject("CheckBoxChecked1", resourceCulture);
+                object obj = ResourceManager.GetObject("AddNoColor", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace TodoUI.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap CheckBoxUnchecked {
+        internal static System.Drawing.Bitmap CheckBoxChecked1 {
             get {
-                object obj = ResourceManager.GetObject("CheckBoxUnchecked", resourceCulture);
+                object obj = ResourceManager.GetObject("CheckBoxChecked1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -87,6 +87,16 @@ namespace TodoUI.Properties {
             get {
                 object obj = ResourceManager.GetObject("CheckBoxUnchecked1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Icon ähnlich wie (Symbol).
+        /// </summary>
+        internal static System.Drawing.Icon Icon {
+            get {
+                object obj = ResourceManager.GetObject("Icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }
