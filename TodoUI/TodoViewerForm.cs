@@ -6,7 +6,7 @@ namespace TodoUI;
 
 // TODO - App beim Systemstart oder anmelden starten
 // TODO - Tastenkombi zum öffnen und Focusieren des Fenster implementieren
-// TODO - Neuste Todos immer oben einfügen
+// TODO - Neuste Todos immer oben einfügen -- Erledigt
 /* TODO - Kategorien
  * Erstellbar, Löschbar
  * speichern in einer csv Datei
@@ -22,20 +22,17 @@ namespace TodoUI;
 public partial class TodoViewerForm : Form
 {
 
-    private NotifyIcon trayIcon;
+    private readonly NotifyIcon trayIcon;
     private ContextMenuStrip trayMenu;
 
     public TodoViewerForm()
     {
         InitializeComponent();
-        //SetFormPosition();
-        // Versteckt die Titelleiste
-        //this.FormBorderStyle = FormBorderStyle.None;
 
         // Erstellen eines ContextMenüs
         trayMenu = new ContextMenuStrip();
         trayMenu.Items.Add("Öffnen", null, OnOpen);
-        trayMenu.Items.Add("Beenden", null, OnExit);
+        trayMenu.Items.Add("Beenden", null, BtnQuit_Click);
         
         // Erstellen eines SystemTrayIcons
         trayIcon = new NotifyIcon();
@@ -53,12 +50,7 @@ public partial class TodoViewerForm : Form
         Show();
         WindowState = FormWindowState.Normal;
         trayIcon.Visible = false;
-    }
-
-    private void OnExit(object sender, EventArgs e)
-    {
-        trayIcon.Visible = false;
-        Application.Exit();
+        ShowInTaskbar = true;
     }
 
     protected override void OnResize(EventArgs e)
@@ -79,31 +71,27 @@ public partial class TodoViewerForm : Form
     }
 
     /// <summary>
-    /// Reagiert auf das KeyDown-Ereignis der Textbox für Todo-Einträge. Wenn die Enter-Taste gedrückt wird,
-    /// unterdrückt diese Methode das akustische Signal des Tastendrucks und prüft den Text der Textbox auf Inhalte.
-    /// Ist der Text nicht leer oder nur Leerzeichen, wird ein neues TodoModel-Objekt erstellt und dem Datenmodell hinzugefügt.
-    /// Das zugehörige TodoItemControl wird dann im FlowLayoutPanel hinzugefügt und das Textfeld geleert.
+    /// Event-Handler, der auf das Drücken der Enter-Taste in der TxtBoxTodoEntry TextBox reagiert.
+    /// Erstellt ein neues TodoModel aus dem Texteingabewert, speichert es, lädt alle Todos neu und leert das Texteingabefeld.
     /// </summary>
     private void TxtBoxTodoEntry_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.KeyCode == Keys.Enter)
         {
-            // Prevents the enter tone from sounding
+            // Verhindert den Ton, der beim Drücken der Enter-Taste ertönt
             e.SuppressKeyPress = true;
 
             if (!String.IsNullOrWhiteSpace(TxtBoxTodoEntry.Text))
             {
-                // Erstellt das TodoModel aus dem Input
+                // Erstellt ein neues TodoModel aus dem Texteingabewert
                 TodoModel model = new TodoModel(TxtBoxTodoEntry.Text, false);
                 GlobalConfig.Connection.CreateTodoModel(model);
 
-                var todoitem = new TodoItemControl
-                {
-                    Model = model,
-                };
+                // Löscht alle aktuellen Einträge und lädt sie neu
+                flowLayoutPanelTodos.Controls.Clear();
+                LoadTodos();
 
-                flowLayoutPanelTodos.Controls.Add(todoitem);
-
+                // Leert das Texteingabefeld
                 TxtBoxTodoEntry.Text = "";
             }
         }
@@ -120,7 +108,7 @@ public partial class TodoViewerForm : Form
             e.SuppressKeyPress = true;
             this.WindowState = FormWindowState.Minimized;
         }
-        else if (e.Control && e.KeyCode == Keys.N)
+        else if (e.Control && e.KeyCode == Keys.U)
         {
             this.WindowState = FormWindowState.Normal;
         }
@@ -131,10 +119,18 @@ public partial class TodoViewerForm : Form
         LoadTodos();
     }
 
+    /// <summary>
+    /// Lädt alle TodoModel-Einträge aus der Datei, kehrt deren Reihenfolge um und fügt sie der Benutzeroberfläche hinzu.
+    /// </summary>
     private void LoadTodos()
     {
+        // Lädt alle TodoModel-Einträge aus der Datei
         List<TodoModel> todos = GlobalConfig.Connection.LoadTodosFromFile();
 
+        // Kehrt die Reihenfolge der Liste um
+        todos.Reverse();
+
+        // Fügt jeden TodoModel-Eintrag der Benutzeroberfläche hinzu
         foreach (TodoModel todo in todos)
         {
             AddTodoToUI(todo);
@@ -142,26 +138,18 @@ public partial class TodoViewerForm : Form
     }
 
     /// <summary>
-    /// Setzt die Größe des Formulars und positioniert es unten rechts auf dem Bildschirm.
-    /// Die Methode berechnet die optimale Position basierend auf der Arbeitsfläche des primären Bildschirms,
-    /// sodass das Formular in der Ecke des Bildschirms angezeigt wird, mit einer kleinen Verschiebung von 22 Pixeln nach oben.
+    /// Fügt ein TodoModel der Benutzeroberfläche als TodoItemControl hinzu.
     /// </summary>
-    private void SetFormPosition()
-    {
-        this.Size = new Size(600, 500);
-
-        Rectangle screenSize = Screen.PrimaryScreen.WorkingArea;
-
-        this.Location = new Point(screenSize.Width - this.Width, screenSize.Height - this.Height + 22);
-    }
-
+    /// <param name="model">Das TodoModel, das hinzugefügt werden soll.</param>
     private void AddTodoToUI(TodoModel model)
     {
+        // Erstellt ein neues TodoItemControl und weist ihm das übergebene TodoModel zu
         TodoItemControl todoitem = new TodoItemControl
         {
             Model = model
         };
 
+        // Fügt das TodoItemControl dem flowLayoutPanelTodos hinzu
         flowLayoutPanelTodos.Controls.Add(todoitem);
     }
 
@@ -171,7 +159,8 @@ public partial class TodoViewerForm : Form
     /// </summary>
     private void BtnQuit_Click(object sender, EventArgs e)
     {
-        this.Close();
+        trayIcon.Visible = false;
+        Application.Exit();
     }
 
     /// <summary>

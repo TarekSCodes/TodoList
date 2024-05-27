@@ -12,6 +12,11 @@ public class TextConnector : IDataConnection
 {
     private const string TodoFile = "TodoModels.csv";
 
+    /// <summary>
+    /// Erstellt ein neues TodoModel, weist ihm eine eindeutige ID zu und speichert es in der Textdatei.
+    /// </summary>
+    /// <param name="model">Das zu erstellende TodoModel.</param>
+    /// <returns>Das erstellte TodoModel mit zugewiesener ID.</returns>
     public TodoModel CreateTodoModel(TodoModel model)
     {
         // Lädt die Textdatei und konvertiert den Text in eine List<TodoModel>

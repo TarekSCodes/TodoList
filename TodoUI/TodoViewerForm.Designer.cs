@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TodoViewerForm));
             TxtBoxTodoEntry = new TextBox();
             flowLayoutPanelTodos = new FlowLayoutPanel();
             BtnQuit = new Button();
@@ -86,10 +87,10 @@
             Controls.Add(flowLayoutPanelTodos);
             Controls.Add(TxtBoxTodoEntry);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             KeyPreview = true;
             MaximizeBox = false;
             Name = "TodoViewerForm";
-            ShowIcon = false;
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             TopMost = true;

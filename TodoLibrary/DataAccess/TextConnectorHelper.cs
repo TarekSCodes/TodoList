@@ -48,6 +48,7 @@ public static class TextConnectorHelper
             return new List<string>();
         }
 
+
         return File.ReadLines(file).ToList();
     }
 
