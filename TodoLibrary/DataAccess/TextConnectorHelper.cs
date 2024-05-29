@@ -1,11 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Configuration;
 using TodoLibrary.Models;
 
 
@@ -107,6 +100,6 @@ public static class TextConnectorHelper
     // TODO - Speichern der Settings.csv jedesmal wenn ein eine Checkbox geändert wird
     public static void SaveSettingsFile(this List<string> settings, string fileName)
     {
-        throw new NotImplementedException();
+        File.WriteAllLines(fileName.FullFilePath(), settings);
     }
 }

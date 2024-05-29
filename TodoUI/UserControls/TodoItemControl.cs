@@ -1,16 +1,5 @@
-﻿using Microsoft.VisualBasic.ApplicationServices;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TodoLibrary;
+﻿using TodoLibrary;
 using TodoLibrary.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TodoUI;
 
@@ -18,7 +7,7 @@ namespace TodoUI;
 public partial class TodoItemControl : UserControl
 {
     private bool isChecked = false;
-    
+
     private TodoModel model;
 
     public TodoModel Model
@@ -35,7 +24,7 @@ public partial class TodoItemControl : UserControl
     public string TodoContent
     {
         get { return label1.Text; }
-        set 
+        set
         {
             label1.Text = value;
             if (model != null)
@@ -44,7 +33,7 @@ public partial class TodoItemControl : UserControl
             }
         }
     }
-    
+
     public bool TodoDone
     {
         get { return isChecked; }

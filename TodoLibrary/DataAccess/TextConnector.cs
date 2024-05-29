@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TodoLibrary.Models;
+﻿using TodoLibrary.Models;
 
 
 namespace TodoLibrary.DataAccess;
@@ -58,6 +53,16 @@ public class TextConnector : IDataConnection
         }
 
         todos.SaveToTodoFile(TodoFile);
+    }
+
+    public void UpdateSettings(bool topmost, bool hideCompleted)
+    {
+        List<string> settings = new List<string>();
+
+        settings.Add(Convert.ToString(topmost));
+        settings.Add(Convert.ToString(hideCompleted));
+
+        settings.SaveSettingsFile(SettingsFile);
     }
 
     public List<TodoModel> LoadTodosFromFile()

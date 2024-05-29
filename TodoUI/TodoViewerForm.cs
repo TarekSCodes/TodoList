@@ -6,7 +6,6 @@ namespace TodoUI;
 
 // TODO - App beim Systemstart oder anmelden starten
 // TODO - Tastenkombi zum öffnen und Focusieren des Fenster implementieren
-// TODO - Neuste Todos immer oben einfügen -- Erledigt
 /* TODO - Kategorien
  * Erstellbar, Löschbar
  * speichern in einer csv Datei
@@ -14,15 +13,9 @@ namespace TodoUI;
  */
 
 /* TODO - Settings
- * Settings Textdatei erstellen
- * 
- * 
- * Abgehakte Todos ausblenden 
- * 
- * 
- * Topmost Ja/Nein
  * Tastenkombi zum öffnen selbst vergeben
-*/
+ * Neu abgehakte Todos müssen auch aus der gui ausgeblendet werden wenn die einstellung so gesetzt ist
+ */
 
 public partial class TodoViewerForm : Form
 {
@@ -42,21 +35,20 @@ public partial class TodoViewerForm : Form
 
     private void InitializesettingsMenu()
     {
-        // Menu Test
         settingsMenu = new ContextMenuStrip();
-
-        // Abgehakte Todos ausblenden
-        menuItemHideCompleted = new ToolStripMenuItem("Abgehakte Todos ausblenden");
-        menuItemHideCompleted.CheckOnClick = true;
-        menuItemHideCompleted.CheckedChanged += MenuItemHideCompleted_CheckedChanged;
 
         // Immer im Vordergrund
         menuItemAlwaysOnTop = new ToolStripMenuItem("Immer im Vordergrund");
         menuItemAlwaysOnTop.CheckOnClick = true;
         menuItemAlwaysOnTop.CheckedChanged += MenuItemAlwaysOnTop_CheckedChanged;
 
-        settingsMenu.Items.Add(menuItemHideCompleted);
+        // Abgehakte Todos ausblenden
+        menuItemHideCompleted = new ToolStripMenuItem("Abgehakte Todos ausblenden");
+        menuItemHideCompleted.CheckOnClick = true;
+        menuItemHideCompleted.CheckedChanged += MenuItemHideCompleted_CheckedChanged;
+
         settingsMenu.Items.Add(menuItemAlwaysOnTop);
+        settingsMenu.Items.Add(menuItemHideCompleted);
     }
 
     private void InitializeTrayMenu()
@@ -77,23 +69,27 @@ public partial class TodoViewerForm : Form
         trayIcon.DoubleClick += OnOpen;
     }
 
+    /// <summary>
+    /// Diese Methode öffnet die Anwendung aus dem Systemtray,
+    /// zeigt das Hauptfenster an und stellt es auf den normalen Zustand zurück.
+    /// </summary>
     private void OnOpen(object sender, EventArgs e)
     {
         Show();
         WindowState = FormWindowState.Normal;
-        trayIcon.Visible = false;
         ShowInTaskbar = true;
     }
 
+    /// <summary>
+    /// Behandelt das Resize-Ereignis der Form.
+    /// Minimiert die Form in das Systemtray, wenn sie minimiert wird.
+    /// </summary>
     protected override void OnResize(EventArgs e)
     {
         base.OnResize(e);
 
         if (WindowState == FormWindowState.Minimized)
-        {
             Hide();
-            trayIcon.Visible = true;
-        }
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)
@@ -149,29 +145,68 @@ public partial class TodoViewerForm : Form
     private void TodoViewerForm_Load(object sender, EventArgs e)
     {
         LoadTodos();
-        LoadSettings();
     }
 
     /// <summary>
-    /// Lädt alle TodoModel-Einträge aus der Datei, kehrt deren Reihenfolge um und fügt sie der Benutzeroberfläche hinzu.
+    /// Lädt alle To-do-Einträge aus der Datei, filtert sie basierend auf den Benutzereinstellungen und aktualisiert die Benutzeroberfläche.
     /// </summary>
+    /// <remarks>
+    /// Diese Methode lädt alle To-do-Einträge aus der Datei und kehrt die Reihenfolge der Liste um. Anschließend wird überprüft, ob abgeschlossene
+    /// To-dos ausgeblendet werden sollen. Basierend auf dieser Einstellung wird die Liste der To-dos gefiltert und die Benutzeroberfläche entsprechend aktualisiert.
+    /// </remarks>
     private void LoadTodos()
     {
-        // Lädt alle TodoModel-Einträge aus der Datei
+        // Lädt alle TodoModel-Einträge aus der Datei und kehrt die Reihenfolge der Liste um
         List<TodoModel> todos = GlobalConfig.Connection.LoadTodosFromFile();
-
-        // Kehrt die Reihenfolge der Liste um
         todos.Reverse();
 
-        // Fügt jeden TodoModel-Eintrag der Benutzeroberfläche hinzu
-        foreach (TodoModel todo in todos)
-        {
-            AddTodoToUI(todo);
-        }
+        // Lädt die Einstellung, ob abgeschlossene Todos ausgeblendet werden sollen
+        bool shouldHideCompletedTodos = LoadSettings();
+
+        // Filtert die Todos basierend auf der Einstellung
+        IEnumerable<TodoModel> filteredTodos = FilterTodos(todos, shouldHideCompletedTodos);
+
+        // Aktualisiert die Benutzeroberfläche
+        UpdateUI(filteredTodos);
     }
 
-    // Verknüpfen von LoadTodos und LoadSettings damit die abgehakten Todos nicht geladen werden falls gewünscht
-    private void LoadSettings()
+    /// <summary>
+    /// Filtert die Liste der To-dos basierend auf der Einstellung, ob abgeschlossene To-dos ausgeblendet werden sollen.
+    /// </summary>
+    /// <param name="todos">Die ursprüngliche Liste der To-dos.</param>
+    /// <param name="shouldHideCompletedTodos">Ein boolescher Wert, der angibt, ob abgeschlossene To-dos ausgeblendet werden sollen.</param>
+    /// <returns>Eine gefilterte Liste der To-dos, bei der abgeschlossene To-dos ausgeblendet werden, wenn <paramref name="shouldHideCompletedTodos"/> wahr ist.</returns>
+    /// <remarks>
+    /// Wenn <paramref name="shouldHideCompletedTodos"/> wahr ist, werden nur die nicht abgeschlossenen To-dos zurückgegeben. Andernfalls wird die ursprüngliche Liste zurückgegeben.
+    /// </remarks>
+    private static IEnumerable<TodoModel> FilterTodos(IEnumerable<TodoModel> todos, bool shouldHideCompletedTodos)
+    {
+        return shouldHideCompletedTodos ? todos.Where(todo => !todo.TodoDone) : todos;
+    }
+
+    /// <summary>
+    /// Aktualisiert die Benutzeroberfläche mit der gegebenen Liste von To-dos.
+    /// </summary>
+    /// <param name="todos">Die Liste der To-dos, die in der Benutzeroberfläche angezeigt werden sollen.</param>
+    /// <remarks>
+    /// Diese Methode löscht alle aktuellen To-do-Kontrollen aus dem `flowLayoutPanelTodos` und fügt dann jede To-do-Kontrolle aus der gegebenen Liste hinzu.
+    /// </remarks>
+    private void UpdateUI(IEnumerable<TodoModel> todos)
+    {
+        flowLayoutPanelTodos.Controls.Clear();
+        foreach (TodoModel todo in todos)
+            AddTodoToUI(todo);
+    }
+
+    /// <summary>
+    /// Lädt die Anwendungseinstellungen aus einer Datei und aktualisiert die Benutzeroberfläche entsprechend.
+    /// </summary>
+    /// <returns>Ein boolescher Wert, der angibt, ob abgeschlossene To-dos ausgeblendet werden sollen.</returns>
+    /// <remarks>
+    /// Diese Methode lädt die Einstellungen, ob die Anwendung immer im Vordergrund sein soll und ob abgeschlossene To-dos ausgeblendet werden sollen, aus einer Datei.
+    /// Sie setzt die entsprechenden UI-Elemente basierend auf diesen Einstellungen.
+    /// </remarks>
+    private bool LoadSettings()
     {
         List<bool> settings = GlobalConfig.Connection.LoadSettingsFromFile();
 
@@ -184,6 +219,8 @@ public partial class TodoViewerForm : Form
         bool HideCompleted = settings.LastOrDefault(false);
         if (HideCompleted)
             menuItemHideCompleted.Checked = true;
+
+        return HideCompleted;
     }
 
     /// <summary>
@@ -212,6 +249,14 @@ public partial class TodoViewerForm : Form
         Application.Exit();
     }
 
+    /// <summary>
+    /// Ereignishandler für den Klick auf den Einstellungen-Button. Berechnet die Position des Buttons und zeigt das Einstellungsmenü an.
+    /// </summary>
+    /// <param name="sender">Das Objekt, das das Ereignis auslöst.</param>
+    /// <param name="e">Das <see cref="EventArgs"/>-Objekt, das die Ereignisdaten enthält.</param>
+    /// <remarks>
+    /// Diese Methode berechnet die Position des Buttons relativ zum Formular und zeigt das Einstellungsmenü an einer festen Position relativ zum Button an.
+    /// </remarks>
     private void BtnSettings_Click(object sender, EventArgs e)
     {
         // Berechne die Position des Buttons relativ zum Formular
@@ -225,14 +270,33 @@ public partial class TodoViewerForm : Form
         this.settingsMenu.Show(x, y);
     }
 
+    /// <summary>
+    /// Ereignishandler für die Änderung des "Always on Top"-Menüelements.
+    /// Aktualisiert die "TopMost"-Eigenschaft der Anwendung und speichert die geänderten Einstellungen.
+    /// </summary>
+    /// <remarks>
+    /// Diese Methode wird aufgerufen, wenn der Status des "Always on Top"-Menüelements geändert wird.
+    /// Sie aktualisiert die "TopMost"-Eigenschaft der Anwendung entsprechend dem neuen Status und speichert die geänderten Einstellungen.
+    /// </remarks>
     private void MenuItemAlwaysOnTop_CheckedChanged(object sender, EventArgs e)
     {
         TopMost = menuItemAlwaysOnTop.Checked;
+        GlobalConfig.Connection.UpdateSettings(TopMost, menuItemHideCompleted.Checked);
     }
-    
+
+    /// <summary>
+    /// Ereignishandler für die Änderung des "Hide Completed"-Menüelements.
+    /// Aktualisiert die Einstellungen und lädt die To-dos basierend auf der neuen Einstellung neu.
+    /// </summary>
+    /// <remarks>
+    /// Diese Methode wird aufgerufen, wenn der Status des "Hide Completed"-Menüelements geändert wird.
+    /// Sie speichert die geänderten Einstellungen und lädt die To-dos basierend auf der neuen Einstellung neu.
+    /// </remarks>
     private void MenuItemHideCompleted_CheckedChanged(object? sender, EventArgs e)
     {
         sender = menuItemHideCompleted.Checked;
+        GlobalConfig.Connection.UpdateSettings(TopMost, menuItemHideCompleted.Checked);
+        LoadTodos();
     }
 
     /// <summary>
