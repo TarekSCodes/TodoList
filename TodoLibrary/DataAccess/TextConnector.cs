@@ -11,6 +11,7 @@ namespace TodoLibrary.DataAccess;
 public class TextConnector : IDataConnection
 {
     private const string TodoFile = "TodoModels.csv";
+    private const string SettingsFile = "Settings.csv";
 
     /// <summary>
     /// Erstellt ein neues TodoModel, weist ihm eine eindeutige ID zu und speichert es in der Textdatei.
@@ -63,5 +64,11 @@ public class TextConnector : IDataConnection
     {
         List<string> lines = TodoFile.FullFilePath().LoadFile();
         return lines.ConvertToTodoModels();
+    }
+
+    public List<bool> LoadSettingsFromFile()
+    {
+        List<string> lines = SettingsFile.FullFilePath().LoadFile();
+        return lines.ConvertSettingsFromFileToBool();
     }
 }

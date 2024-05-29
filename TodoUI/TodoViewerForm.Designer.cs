@@ -75,6 +75,7 @@
             BtnSettings.TabIndex = 1;
             BtnSettings.Text = "Settings";
             BtnSettings.UseVisualStyleBackColor = true;
+            BtnSettings.Click += BtnSettings_Click;
             // 
             // TodoViewerForm
             // 
@@ -93,7 +94,6 @@
             Name = "TodoViewerForm";
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
-            TopMost = true;
             Load += TodoViewerForm_Load;
             KeyDown += TodoViewerForm_KeyDown;
             ResumeLayout(false);

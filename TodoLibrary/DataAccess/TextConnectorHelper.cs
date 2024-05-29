@@ -75,8 +75,19 @@ public static class TextConnectorHelper
         return output;
     }
 
+    public static List<bool> ConvertSettingsFromFileToBool(this List<string> lines)
+    {
+        List<bool> output = new List<bool>();
+
+        foreach (string line in lines)
+        {
+            output.Add(Convert.ToBoolean(line));
+        }
+        return output;
+    }
+
     /// <summary>
-    /// Speichert eine Liste von TodoModel-Objekten in einer Datei. Jedes TodoModel wird in eine Zeile umgewandelt,
+    /// Speichert eine Liste von TodoModel-Objekten in eine Datei. Jedes TodoModel wird in eine Zeile umgewandelt,
     /// wobei die Eigenschaften des Modells durch Tilden ('~') getrennt werden.
     /// </summary>
     /// <param name="models">Die Liste von TodoModel-Objekten, die gespeichert werden sollen.</param>
@@ -91,5 +102,11 @@ public static class TextConnectorHelper
         }
 
         File.WriteAllLines(fileName.FullFilePath(), lines);
+    }
+
+    // TODO - Speichern der Settings.csv jedesmal wenn ein eine Checkbox geändert wird
+    public static void SaveSettingsFile(this List<string> settings, string fileName)
+    {
+        throw new NotImplementedException();
     }
 }

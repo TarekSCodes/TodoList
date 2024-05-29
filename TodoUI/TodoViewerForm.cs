@@ -14,26 +14,58 @@ namespace TodoUI;
  */
 
 /* TODO - Settings
- * Abgehakte Todos ausblenden Ja/Nein Checkbox
- * Tastenkombi zum öffnen selbst vergeben
+ * Settings Textdatei erstellen
+ * 
+ * 
+ * Abgehakte Todos ausblenden 
+ * 
+ * 
  * Topmost Ja/Nein
+ * Tastenkombi zum öffnen selbst vergeben
 */
 
 public partial class TodoViewerForm : Form
 {
 
-    private readonly NotifyIcon trayIcon;
+    private NotifyIcon trayIcon;
     private ContextMenuStrip trayMenu;
+    private ContextMenuStrip settingsMenu;
+    private ToolStripMenuItem menuItemHideCompleted;
+    private ToolStripMenuItem menuItemAlwaysOnTop;
 
     public TodoViewerForm()
     {
         InitializeComponent();
+        InitializeTrayMenu();
+        InitializesettingsMenu();
+    }
 
+    private void InitializesettingsMenu()
+    {
+        // Menu Test
+        settingsMenu = new ContextMenuStrip();
+
+        // Abgehakte Todos ausblenden
+        menuItemHideCompleted = new ToolStripMenuItem("Abgehakte Todos ausblenden");
+        menuItemHideCompleted.CheckOnClick = true;
+        menuItemHideCompleted.CheckedChanged += MenuItemHideCompleted_CheckedChanged;
+
+        // Immer im Vordergrund
+        menuItemAlwaysOnTop = new ToolStripMenuItem("Immer im Vordergrund");
+        menuItemAlwaysOnTop.CheckOnClick = true;
+        menuItemAlwaysOnTop.CheckedChanged += MenuItemAlwaysOnTop_CheckedChanged;
+
+        settingsMenu.Items.Add(menuItemHideCompleted);
+        settingsMenu.Items.Add(menuItemAlwaysOnTop);
+    }
+
+    private void InitializeTrayMenu()
+    {
         // Erstellen eines ContextMenüs
         trayMenu = new ContextMenuStrip();
         trayMenu.Items.Add("Öffnen", null, OnOpen);
         trayMenu.Items.Add("Beenden", null, BtnQuit_Click);
-        
+
         // Erstellen eines SystemTrayIcons
         trayIcon = new NotifyIcon();
         trayIcon.Text = "Simple Todos";
@@ -117,6 +149,7 @@ public partial class TodoViewerForm : Form
     private void TodoViewerForm_Load(object sender, EventArgs e)
     {
         LoadTodos();
+        LoadSettings();
     }
 
     /// <summary>
@@ -135,6 +168,22 @@ public partial class TodoViewerForm : Form
         {
             AddTodoToUI(todo);
         }
+    }
+
+    // Verknüpfen von LoadTodos und LoadSettings damit die abgehakten Todos nicht geladen werden falls gewünscht
+    private void LoadSettings()
+    {
+        List<bool> settings = GlobalConfig.Connection.LoadSettingsFromFile();
+
+        TopMost = settings.FirstOrDefault(false);
+        if (TopMost.Equals(true))
+            menuItemAlwaysOnTop.Checked = true;
+
+        // ----------------- //
+
+        bool HideCompleted = settings.LastOrDefault(false);
+        if (HideCompleted)
+            menuItemHideCompleted.Checked = true;
     }
 
     /// <summary>
@@ -161,6 +210,29 @@ public partial class TodoViewerForm : Form
     {
         trayIcon.Visible = false;
         Application.Exit();
+    }
+
+    private void BtnSettings_Click(object sender, EventArgs e)
+    {
+        // Berechne die Position des Buttons relativ zum Formular
+        Point buttonPosition = BtnSettings.PointToScreen(Point.Empty);
+
+        // Feste Position relativ zum Button festlegen
+        int x = buttonPosition.X;
+        int y = buttonPosition.Y + BtnSettings.Height;
+
+        // Menü an der festen Position anzeigen
+        this.settingsMenu.Show(x, y);
+    }
+
+    private void MenuItemAlwaysOnTop_CheckedChanged(object sender, EventArgs e)
+    {
+        TopMost = menuItemAlwaysOnTop.Checked;
+    }
+    
+    private void MenuItemHideCompleted_CheckedChanged(object? sender, EventArgs e)
+    {
+        sender = menuItemHideCompleted.Checked;
     }
 
     /// <summary>
@@ -193,6 +265,7 @@ public partial class TodoViewerForm : Form
         // Standardverhalten für andere Fälle nutzen
         return base.ProcessCmdKey(ref msg, keyData);
     }
+
 
 
     // TODO - Löschen des Todos beim Rechtklicken

@@ -14,4 +14,6 @@ public interface IDataConnection
     void UpdateTodoDone(TodoModel todo);
 
     List<TodoModel> LoadTodosFromFile();
+
+    List<bool> LoadSettingsFromFile();
 }
