@@ -176,6 +176,7 @@ public partial class TodoViewerForm : Form
         */
     }
 
+    /*
     /// <summary>
     /// Filtert die Liste der To-dos basierend auf der Einstellung, ob abgeschlossene To-dos ausgeblendet werden sollen.
     /// </summary>
@@ -189,6 +190,7 @@ public partial class TodoViewerForm : Form
     {
         return shouldHideCompletedTodos ? todos.Where(todo => !todo.TodoDone) : todos;
     }
+    */
 
     /// <summary>
     /// Aktualisiert die Benutzeroberfläche mit der gegebenen Liste von To-dos.

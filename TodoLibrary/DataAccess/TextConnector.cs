@@ -74,11 +74,11 @@ public class TextConnector : IDataConnection
         //return lines.ConvertToTodoModels();
         todos.Reverse();
 
-        // Lädt die Einstellung, ob abgeschlossene Todos ausgeblendet werden sollen
-        bool shouldHideCompletedTodos = LoadSettings(alwaysOnTopChecked, hideCompleted);
+        // Lädt die Einstellung, ob abgeschlossene Todos ausgeblendet werden sollen und ob Topmost = true ist
+        List<bool> shouldHideCompletedTodos = LoadSettings(alwaysOnTopChecked, hideCompleted);
 
         // Filtert die Todos basierend auf der Einstellung
-        IEnumerable<TodoModel> filteredTodos = FilterTodos(todos, shouldHideCompletedTodos);
+        IEnumerable<TodoModel> filteredTodos = FilterTodos(todos, shouldHideCompletedTodos[1]);
 
         return filteredTodos;
     }
@@ -89,21 +89,26 @@ public class TextConnector : IDataConnection
         return lines.ConvertSettingsFromFileToBool();
     }
 
-    private bool LoadSettings(bool alwaysOnTopChecked, bool hideCompleted)
+    private List<bool> LoadSettings(bool alwaysOnTopChecked, bool hideCompleted)
     {
+        List<bool> output = new List<bool>();
+
         List<bool> settings = GlobalConfig.Connection.LoadSettingsFromFile();
 
         bool topmost = settings.FirstOrDefault(false);
         if (topmost.Equals(true))
             alwaysOnTopChecked = true;
 
+        output.Add(alwaysOnTopChecked);
         // ----------------- //
 
         bool HideCompleted = settings.LastOrDefault(false);
         if (HideCompleted)
             hideCompleted = true;
+        
+        output.Add(hideCompleted);
 
-        return HideCompleted;
+        return output;
     }
 
     private static IEnumerable<TodoModel> FilterTodos(IEnumerable<TodoModel> todos, bool shouldHideCompletedTodos)
