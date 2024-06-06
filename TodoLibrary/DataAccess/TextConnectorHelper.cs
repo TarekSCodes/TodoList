@@ -97,9 +97,11 @@ public static class TextConnectorHelper
         File.WriteAllLines(fileName.FullFilePath(), lines);
     }
 
-    // TODO - Speichern der Settings.csv jedesmal wenn ein eine Checkbox geändert wird
     public static void SaveSettingsFile(this List<string> settings, string fileName)
     {
         File.WriteAllLines(fileName.FullFilePath(), settings);
     }
+
+    
+
 }

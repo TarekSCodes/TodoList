@@ -65,15 +65,49 @@ public class TextConnector : IDataConnection
         settings.SaveSettingsFile(SettingsFile);
     }
 
-    public List<TodoModel> LoadTodosFromFile()
+    // Was brauche ich
+    // - bool von Loadsettings
+    public IEnumerable<TodoModel> LoadTodosFromFile(bool alwaysOnTopChecked, bool hideCompleted)
     {
-        List<string> lines = TodoFile.FullFilePath().LoadFile();
-        return lines.ConvertToTodoModels();
+        // Lädt alle TodoModel-Einträge aus der Datei und kehrt die Reihenfolge der Liste um
+        List<TodoModel> todos = TodoFile.FullFilePath().LoadFile().ConvertToTodoModels();
+        //return lines.ConvertToTodoModels();
+        todos.Reverse();
+
+        // Lädt die Einstellung, ob abgeschlossene Todos ausgeblendet werden sollen
+        bool shouldHideCompletedTodos = LoadSettings(alwaysOnTopChecked, hideCompleted);
+
+        // Filtert die Todos basierend auf der Einstellung
+        IEnumerable<TodoModel> filteredTodos = FilterTodos(todos, shouldHideCompletedTodos);
+
+        return filteredTodos;
     }
 
     public List<bool> LoadSettingsFromFile()
     {
         List<string> lines = SettingsFile.FullFilePath().LoadFile();
         return lines.ConvertSettingsFromFileToBool();
+    }
+
+    private bool LoadSettings(bool alwaysOnTopChecked, bool hideCompleted)
+    {
+        List<bool> settings = GlobalConfig.Connection.LoadSettingsFromFile();
+
+        bool topmost = settings.FirstOrDefault(false);
+        if (topmost.Equals(true))
+            alwaysOnTopChecked = true;
+
+        // ----------------- //
+
+        bool HideCompleted = settings.LastOrDefault(false);
+        if (HideCompleted)
+            hideCompleted = true;
+
+        return HideCompleted;
+    }
+
+    private static IEnumerable<TodoModel> FilterTodos(IEnumerable<TodoModel> todos, bool shouldHideCompletedTodos)
+    {
+        return shouldHideCompletedTodos ? todos.Where(todo => !todo.TodoDone) : todos;
     }
 }

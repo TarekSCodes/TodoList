@@ -12,8 +12,8 @@ namespace TodoUI;
  * Farbe wählbar
  */
 
-/* TODO - Settings
- * Tastenkombi zum öffnen selbst vergeben
+/* SETTINGS
+ * TODO - Tastenkombi zum öffnen selbst vergeben
  * Neu abgehakte Todos müssen auch aus der gui ausgeblendet werden wenn die einstellung so gesetzt ist
  */
 
@@ -156,6 +156,11 @@ public partial class TodoViewerForm : Form
     /// </remarks>
     private void LoadTodos()
     {
+        IEnumerable<TodoModel> filteredTodos = GlobalConfig.Connection.LoadTodosFromFile(menuItemAlwaysOnTop.Checked, menuItemHideCompleted.Checked);
+
+        UpdateUI(filteredTodos);
+
+        /*
         // Lädt alle TodoModel-Einträge aus der Datei und kehrt die Reihenfolge der Liste um
         List<TodoModel> todos = GlobalConfig.Connection.LoadTodosFromFile();
         todos.Reverse();
@@ -168,6 +173,7 @@ public partial class TodoViewerForm : Form
 
         // Aktualisiert die Benutzeroberfläche
         UpdateUI(filteredTodos);
+        */
     }
 
     /// <summary>
@@ -198,6 +204,7 @@ public partial class TodoViewerForm : Form
             AddTodoToUI(todo);
     }
 
+    /*
     /// <summary>
     /// Lädt die Anwendungseinstellungen aus einer Datei und aktualisiert die Benutzeroberfläche entsprechend.
     /// </summary>
@@ -222,6 +229,7 @@ public partial class TodoViewerForm : Form
 
         return HideCompleted;
     }
+    */
 
     /// <summary>
     /// Fügt ein TodoModel der Benutzeroberfläche als TodoItemControl hinzu.
@@ -294,7 +302,7 @@ public partial class TodoViewerForm : Form
     /// </remarks>
     private void MenuItemHideCompleted_CheckedChanged(object? sender, EventArgs e)
     {
-        sender = menuItemHideCompleted.Checked;
+        //sender = menuItemHideCompleted.Checked;
         GlobalConfig.Connection.UpdateSettings(TopMost, menuItemHideCompleted.Checked);
         LoadTodos();
     }

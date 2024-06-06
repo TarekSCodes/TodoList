@@ -10,7 +10,7 @@ public interface IDataConnection
 
     void UpdateSettings(bool topmost, bool hideCompletet);
 
-    List<TodoModel> LoadTodosFromFile();
+    IEnumerable<TodoModel> LoadTodosFromFile(bool alwaysOnTopChecked, bool hideCompleted);
 
     List<bool> LoadSettingsFromFile();
 }
