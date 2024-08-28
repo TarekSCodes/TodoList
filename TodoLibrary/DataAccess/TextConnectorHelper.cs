@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using TodoLibrary.Models;
 
-
 namespace TodoLibrary.DataAccess;
-
 
 public static class TextConnectorHelper
 {
@@ -101,7 +99,4 @@ public static class TextConnectorHelper
     {
         File.WriteAllLines(fileName.FullFilePath(), settings);
     }
-
-    
-
 }

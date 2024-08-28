@@ -156,25 +156,17 @@ public partial class TodoViewerForm : Form
     /// </remarks>
     private void LoadTodos()
     {
-        IEnumerable<TodoModel> filteredTodos = GlobalConfig.Connection.LoadTodosFromFile(menuItemAlwaysOnTop.Checked, menuItemHideCompleted.Checked);
+        var result = GlobalConfig.Connection.LoadTodosFromFile(menuItemAlwaysOnTop.Checked, menuItemHideCompleted.Checked);
+
+        IEnumerable<TodoModel> filteredTodos = result.filteredTodos;
+        List<bool> shouldHideCompletedTodos = result.shouldHideCompletedTodos;
+
+        menuItemAlwaysOnTop.Checked = shouldHideCompletedTodos[0];
+        menuItemHideCompleted.Checked = shouldHideCompletedTodos[1]; 
 
         UpdateUI(filteredTodos);
-
-        /*
-        // Lädt alle TodoModel-Einträge aus der Datei und kehrt die Reihenfolge der Liste um
-        List<TodoModel> todos = GlobalConfig.Connection.LoadTodosFromFile();
-        todos.Reverse();
-
-        // Lädt die Einstellung, ob abgeschlossene Todos ausgeblendet werden sollen
-        bool shouldHideCompletedTodos = LoadSettings();
-
-        // Filtert die Todos basierend auf der Einstellung
-        IEnumerable<TodoModel> filteredTodos = FilterTodos(todos, shouldHideCompletedTodos);
-
-        // Aktualisiert die Benutzeroberfläche
-        UpdateUI(filteredTodos);
-        */
     }
+
 
     /*
     /// <summary>
@@ -248,6 +240,7 @@ public partial class TodoViewerForm : Form
         // Fügt das TodoItemControl dem flowLayoutPanelTodos hinzu
         flowLayoutPanelTodos.Controls.Add(todoitem);
     }
+
 
     /// <summary>
     /// Behandelt das Click-Ereignis des "Quit"-Buttons. Diese Methode schließt das aktuelle Formular,

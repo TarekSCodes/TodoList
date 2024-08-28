@@ -1,14 +1,15 @@
 ﻿using TodoLibrary;
 using TodoLibrary.Models;
 
+
 namespace TodoUI;
 
 // TODO - Hinzufügen eines grafischen Trennzeichens im Designer zwischen TodoContent und TodoDone passend zur Kategoriefarbe
 public partial class TodoItemControl : UserControl
 {
     private bool isChecked = false;
-
     private TodoModel model;
+    
 
     public TodoModel Model
     {
@@ -42,6 +43,7 @@ public partial class TodoItemControl : UserControl
             isChecked = value;
             pictureBox1.Image = isChecked ? Properties.Resources.CheckBoxChecked1 : Properties.Resources.CheckBoxUnchecked1;
             label1.Font = isChecked ? new System.Drawing.Font(label1.Font, FontStyle.Strikeout) : new System.Drawing.Font(label1.Font, FontStyle.Bold);
+            
             if (model != null)
             {
                 model.TodoDone = isChecked;
@@ -55,6 +57,7 @@ public partial class TodoItemControl : UserControl
 
         GlobalConfig.Connection.UpdateTodoDone(this.Model);
     }
+
 
     public TodoItemControl()
     {

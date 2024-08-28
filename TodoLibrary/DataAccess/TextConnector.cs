@@ -65,13 +65,10 @@ public class TextConnector : IDataConnection
         settings.SaveSettingsFile(SettingsFile);
     }
 
-    // Was brauche ich
-    // - bool von Loadsettings
-    public IEnumerable<TodoModel> LoadTodosFromFile(bool alwaysOnTopChecked, bool hideCompleted)
+    public (IEnumerable<TodoModel> filteredTodos, List<bool> shouldHideCompletedTodos) LoadTodosFromFile(bool alwaysOnTopChecked, bool hideCompleted)
     {
         // Lädt alle TodoModel-Einträge aus der Datei und kehrt die Reihenfolge der Liste um
         List<TodoModel> todos = TodoFile.FullFilePath().LoadFile().ConvertToTodoModels();
-        //return lines.ConvertToTodoModels();
         todos.Reverse();
 
         // Lädt die Einstellung, ob abgeschlossene Todos ausgeblendet werden sollen und ob Topmost = true ist
@@ -80,7 +77,8 @@ public class TextConnector : IDataConnection
         // Filtert die Todos basierend auf der Einstellung
         IEnumerable<TodoModel> filteredTodos = FilterTodos(todos, shouldHideCompletedTodos[1]);
 
-        return filteredTodos;
+        // Rückgabe des Tupels
+        return (filteredTodos, shouldHideCompletedTodos);
     }
 
     public List<bool> LoadSettingsFromFile()
