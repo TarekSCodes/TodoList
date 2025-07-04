@@ -12,5 +12,5 @@ public interface IDataConnection
 
     List<TodoModel> LoadTodosFromFile();
 
-    List<bool> LoadSettingsFromFile();
+    SettingsDTO LoadSettingsFromFile();
 }

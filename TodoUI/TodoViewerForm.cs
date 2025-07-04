@@ -1,4 +1,3 @@
-using System;
 using TodoLibrary;
 using TodoLibrary.Models;
 
@@ -73,7 +72,7 @@ public partial class TodoViewerForm : Form
     /// Diese Methode öffnet die Anwendung aus dem Systemtray,
     /// zeigt das Hauptfenster an und stellt es auf den normalen Zustand zurück.
     /// </summary>
-    private void OnOpen(object sender, EventArgs e)
+    private void OnOpen(object? sender, EventArgs e)
     {
         Show();
         WindowState = FormWindowState.Normal;
@@ -208,15 +207,15 @@ public partial class TodoViewerForm : Form
     /// </remarks>
     private bool LoadSettings()
     {
-        List<bool> settings = GlobalConfig.Connection.LoadSettingsFromFile();
+        SettingsDTO settings = GlobalConfig.Connection.LoadSettingsFromFile();
 
-        TopMost = settings.FirstOrDefault(false);
+        TopMost = settings.Topmost;
         if (TopMost.Equals(true))
             menuItemAlwaysOnTop.Checked = true;
 
         // ----------------- //
 
-        bool HideCompleted = settings.LastOrDefault(false);
+        bool HideCompleted = settings.HideCompleted;
         if (HideCompleted)
             menuItemHideCompleted.Checked = true;
 
@@ -235,15 +234,23 @@ public partial class TodoViewerForm : Form
             Model = model
         };
 
-        // Fügt das TodoItemControl dem flowLayoutPanelTodos hinzu
+        todoitem.TodoStatusChanged += TodoItemControl_TodoStatuschanged;
         flowLayoutPanelTodos.Controls.Add(todoitem);
+    }
+
+    private void TodoItemControl_TodoStatuschanged(object? sender, EventArgs e)
+    {
+        if (menuItemHideCompleted.Checked)
+        {
+            LoadTodos();
+        }
     }
 
     /// <summary>
     /// Behandelt das Click-Ereignis des "Quit"-Buttons. Diese Methode schließt das aktuelle Formular,
     /// was typischerweise zum Beenden der Anwendung oder zum Schließen des aktuellen Fensters führt.
     /// </summary>
-    private void BtnQuit_Click(object sender, EventArgs e)
+    private void BtnQuit_Click(object? sender, EventArgs e)
     {
         trayIcon.Visible = false;
         Application.Exit();
@@ -278,7 +285,7 @@ public partial class TodoViewerForm : Form
     /// Diese Methode wird aufgerufen, wenn der Status des "Always on Top"-Menüelements geändert wird.
     /// Sie aktualisiert die "TopMost"-Eigenschaft der Anwendung entsprechend dem neuen Status und speichert die geänderten Einstellungen.
     /// </remarks>
-    private void MenuItemAlwaysOnTop_CheckedChanged(object sender, EventArgs e)
+    private void MenuItemAlwaysOnTop_CheckedChanged(object? sender, EventArgs e)
     {
         TopMost = menuItemAlwaysOnTop.Checked;
         GlobalConfig.Connection.UpdateSettings(TopMost, menuItemHideCompleted.Checked);
@@ -317,7 +324,7 @@ public partial class TodoViewerForm : Form
             if (currentControl.TabIndex == 2)
             {
                 // Suche nach dem Steuerelement mit `TabIndex` 0
-                Control firstControl = this.Controls.Cast<Control>().FirstOrDefault(c => c.TabIndex == 0 && c.CanSelect && c.TabStop);
+                Control? firstControl = this.Controls.Cast<Control>().FirstOrDefault(c => c.TabIndex == 0 && c.CanSelect && c.TabStop);
                 if (firstControl != null)
                 {
                     firstControl.Focus();

@@ -7,7 +7,7 @@ namespace TodoUI;
 public partial class TodoItemControl : UserControl
 {
     private bool isChecked = false;
-
+    public event EventHandler? TodoStatusChanged;
     private TodoModel model;
 
     public TodoModel Model
@@ -52,8 +52,8 @@ public partial class TodoItemControl : UserControl
     private void pictureBox1_Click(object sender, EventArgs e)
     {
         TodoDone = !TodoDone;
-
         GlobalConfig.Connection.UpdateTodoDone(this.Model);
+        TodoStatusChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public TodoItemControl()

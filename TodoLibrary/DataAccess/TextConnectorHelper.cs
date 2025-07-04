@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Diagnostics;
+using System.Text.Json;
 using TodoLibrary.Models;
 
 
@@ -8,12 +10,15 @@ namespace TodoLibrary.DataAccess;
 public static class TextConnectorHelper
 {
     private static readonly IConfiguration Configuration;
+    private static SettingsDTO? settingsDTO;
 
     static TextConnectorHelper()
     {
         Configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .Build();
+
+        TextConnectorHelper.EnsureSettingsFileExists("Settings.json");
     }
 
     /// <summary>
@@ -28,21 +33,20 @@ public static class TextConnectorHelper
     }
 
     /// <summary>
-    /// Lädt den Inhalt einer Datei und gibt ihn als Liste von Zeilen zurück.
-    /// Wenn die angegebene Datei nicht existiert, wird eine leere Liste zurückgegeben.
+    /// Lädt den Inhalt einer Datei und gibt ihn als String zurück.
+    /// Wenn die angegebene Datei nicht existiert, wird ein leerer String zurückgegeben.
     /// Diese Methode ermöglicht es, den Dateiinhalt einfach zu lesen und für weitere Verarbeitungen zu nutzen.
     /// </summary>
     /// <param name="file">Der Pfad zur Datei, deren Inhalt geladen werden soll.</param>
-    /// <returns>Eine Liste von Zeilen (Strings) aus der Datei. Wenn die Datei nicht existiert, wird eine leere Liste zurückgegeben.</returns>
-    public static List<string> LoadFile(this string file)
+    /// <returns>Den gesamten Inhalt der Datei als String. Wenn die Datei nicht existiert, wird ein leerer String zurückgegeben.</returns>
+    public static string LoadFile(this string file)
     {
         if (!File.Exists(file))
         {
-            return new List<string>();
+            return string.Empty;
         }
 
-
-        return File.ReadLines(file).ToList();
+        return File.ReadAllText(file);
     }
 
     /// <summary>
@@ -50,56 +54,79 @@ public static class TextConnectorHelper
     /// </summary>
     /// <param name="lines"></param>
     /// <returns>List<TodoModel></returns>
-    public static List<TodoModel> ConvertToTodoModels(this List<string> lines)
+    public static List<TodoModel> ConvertToTodoModels(this string jsonString)
     {
-        List<TodoModel> output = new List<TodoModel>();
-
-        foreach (string line in lines)
+        if (String.IsNullOrEmpty(jsonString))
         {
-            string[] cols = line.Split('~');
-
-            TodoModel todo = new TodoModel();
-            todo.Id = int.Parse(cols[0]);
-            todo.TodoContent = cols[1];
-            todo.TodoDone = Convert.ToBoolean(cols[2]);
-
-            output.Add(todo);
+            return new List<TodoModel>();
         }
-        return output;
+
+        try
+        {
+            List<TodoModel>? todoList = JsonSerializer.Deserialize<List<TodoModel>>(jsonString);
+            return todoList ?? new List<TodoModel>();
+        }
+        catch (JsonException e)
+        {
+            Debug.WriteLine($"JsonString konnte nicht in ein TodoModel Convertiert werden {e}");
+            return new List<TodoModel>();
+        }
     }
 
-    public static List<bool> ConvertSettingsFromFileToBool(this List<string> lines)
+    public static SettingsDTO ConvertSettingsFromFileToSettingsDTO(this string settings)
     {
-        List<bool> output = new List<bool>();
-
-        foreach (string line in lines)
+        if (string.IsNullOrEmpty(settings))
         {
-            output.Add(Convert.ToBoolean(line));
+            settingsDTO = new SettingsDTO(false, false);
+            return settingsDTO;
         }
-        return output;
+
+        try
+        {
+            settingsDTO = JsonSerializer.Deserialize<SettingsDTO>(settings);
+            if (settingsDTO == null)
+                settingsDTO = new SettingsDTO(false, false);
+            return settingsDTO;
+        }
+        catch (JsonException e)
+        {
+            Debug.WriteLine($"Settings Json String konnte nicht in ein SettingsDTO Covertiert werden: {e.Message}");
+            return settingsDTO = new SettingsDTO(false, false);
+        }
     }
 
     /// <summary>
-    /// Speichert eine Liste von TodoModel-Objekten in eine Datei. Jedes TodoModel wird in eine Zeile umgewandelt,
-    /// wobei die Eigenschaften des Modells durch Tilden ('~') getrennt werden.
+    /// Speichert eine Liste von TodoModel-Objekten in einer Json-Datei. Jedes TodoModel wird in ein Json-Objekt umgewandelt.
     /// </summary>
     /// <param name="models">Die Liste von TodoModel-Objekten, die gespeichert werden sollen.</param>
     /// <param name="fileName">Der Dateiname, unter dem die Liste gespeichert wird. Der Pfad wird durch die Methode FullFilePath erweitert.</param>
     public static void SaveToTodoFile(this List<TodoModel> models, string fileName)
     {
-        List<string> lines = new List<string>();
-
-        foreach (TodoModel model in models)
-        {
-            lines.Add($"{model.Id}~{model.TodoContent}~{model.TodoDone}");
-        }
-
-        File.WriteAllLines(fileName.FullFilePath(), lines);
+        JsonSerializerOptions options = new JsonSerializerOptions();
+        options.WriteIndented = true;
+        string jsonString = JsonSerializer.Serialize(models, options);
+        File.WriteAllText(fileName.FullFilePath(), jsonString);
     }
 
-    // TODO - Speichern der Settings.csv jedesmal wenn ein eine Checkbox geändert wird
-    public static void SaveSettingsFile(this List<string> settings, string fileName)
+    public static void SaveSettingsFile(SettingsDTO settings, string fileName)
     {
-        File.WriteAllLines(fileName.FullFilePath(), settings);
+        string jsonString = JsonSerializer.Serialize<SettingsDTO>(settings);
+        Debug.WriteLine($"Json String in SaveSettingsFile {jsonString}");
+        File.WriteAllText(fileName.FullFilePath(), jsonString);
+    }
+
+    /// <summary>
+    /// Stellt sicher, dass die Einstellungsdatei existiert. Wenn sie nicht existiert, wird eine neue Datei mit Standardwerten erstellt.
+    /// </summary>
+    /// <param name="fileName">Der Dateiname der Einstellungsdatei.</param>
+    public static void EnsureSettingsFileExists(string fileName)
+    {
+        string fullPath = fileName.FullFilePath();
+        if (!File.Exists(fullPath))
+        {
+            var defaultSettings = new SettingsDTO(false, false);
+            string jsonString = JsonSerializer.Serialize<SettingsDTO>(defaultSettings);
+            File.WriteAllText(fullPath, jsonString);
+        }
     }
 }

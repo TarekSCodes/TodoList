@@ -9,7 +9,7 @@ namespace TodoLibrary.Models;
 public class TodoModel
 {
     public int Id { get; set; }
-    public string TodoContent { get; set; }
+    public string TodoContent { get; set; } = string.Empty;
     public bool TodoDone { get; set; }
     public TodoModel() { }
 

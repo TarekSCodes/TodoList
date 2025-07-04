@@ -1,12 +1,13 @@
-﻿using TodoLibrary.Models;
+﻿using System.Text.Json;
+using TodoLibrary.Models;
 
 
 namespace TodoLibrary.DataAccess;
 
 public class TextConnector : IDataConnection
 {
-    private const string TodoFile = "TodoModels.csv";
-    private const string SettingsFile = "Settings.csv";
+    private const string TodoFile = "TodoModels.json";
+    private const string SettingsFile = "Settings.json";
 
     /// <summary>
     /// Erstellt ein neues TodoModel, weist ihm eine eindeutige ID zu und speichert es in der Textdatei.
@@ -26,11 +27,8 @@ public class TextConnector : IDataConnection
         }
         model.Id = currentId;
 
-        // Add the new record with the new ID (max + 1)
         todos.Add(model);
 
-        // Konvertiert das TodoModel in List<string>
-        // Speichert die List<string> in die Textdatei
         todos.SaveToTodoFile(TodoFile);
 
         return model;
@@ -57,23 +55,18 @@ public class TextConnector : IDataConnection
 
     public void UpdateSettings(bool topmost, bool hideCompleted)
     {
-        List<string> settings = new List<string>();
-
-        settings.Add(Convert.ToString(topmost));
-        settings.Add(Convert.ToString(hideCompleted));
-
-        settings.SaveSettingsFile(SettingsFile);
+        TextConnectorHelper.SaveSettingsFile(new SettingsDTO(topmost, hideCompleted), SettingsFile);
     }
 
     public List<TodoModel> LoadTodosFromFile()
     {
-        List<string> lines = TodoFile.FullFilePath().LoadFile();
-        return lines.ConvertToTodoModels();
+        List<TodoModel> lines = TodoFile.FullFilePath().LoadFile().ConvertToTodoModels();
+        return lines;
     }
 
-    public List<bool> LoadSettingsFromFile()
+    public SettingsDTO LoadSettingsFromFile()
     {
-        List<string> lines = SettingsFile.FullFilePath().LoadFile();
-        return lines.ConvertSettingsFromFileToBool();
+        SettingsDTO settings = SettingsFile.FullFilePath().LoadFile().ConvertSettingsFromFileToSettingsDTO();
+        return settings;
     }
 }
